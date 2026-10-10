@@ -28,4 +28,3 @@ jobs:
     - name: Execute Automated Unit Tests
       run: |
         python -m unittest discover -s tests -v
-'@ | Out-File -FilePath .github\workflows\ci.yml -Encoding utf8
