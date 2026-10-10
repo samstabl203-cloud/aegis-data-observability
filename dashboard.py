@@ -695,7 +695,8 @@ elif app_mode == PAGE_CUSTOM_CSV:
             hide_index=True,
         )
 
-        with c_tab3:
+    # Sub-tab 3 properly aligned and decoupled from Sub-tab 2
+    with c_tab3:
       st.markdown("##### 🧹 Automated Remediation & Cleansing Engine")
       cleaned_custom_df = user_df.copy()
 
@@ -715,7 +716,6 @@ elif app_mode == PAGE_CUSTOM_CSV:
             cleaned_custom_df[target_c], errors="coerce"
         ).astype(float)
 
-        # Calculate median of strictly positive values
         positive_vals = numeric_s[numeric_s > 0]
         med_val = (
             float(positive_vals.median()) if len(positive_vals) > 0 else 1.0
@@ -756,7 +756,6 @@ elif app_mode == PAGE_DRIFT:
       unsafe_allow_html=True,
   )
 
-  # Check if baseline file exists
   base_path = data_dir / "retail_corrupted.csv"
   if not base_path.exists():
     st.error("Baseline dataset not found.")
@@ -783,7 +782,6 @@ elif app_mode == PAGE_DRIFT:
 
   with col_test1:
     st.subheader("1. Pricing Distribution Drift (`unit_price`)")
-    # Identify price column in target
     target_price_col = (
         "unit_price"
         if "unit_price" in compare_target_df.columns
