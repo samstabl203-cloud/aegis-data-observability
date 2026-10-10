@@ -1,0 +1,28 @@
+# Virtual Environment
+.venv/
+venv/
+ENV/
+env/
+
+# Python Cache & Bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Test & Coverage Outputs
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Operating System & IDE Artifacts
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# Temporary report dumps (optional - keep templates/examples)
+reports/*.png
+reports/*.html

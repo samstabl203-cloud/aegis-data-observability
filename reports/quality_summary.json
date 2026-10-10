@@ -1,0 +1,48 @@
+{
+  "rows_audited": 201,
+  "columns_audited": [
+    "order_id",
+    "order_date",
+    "customer_id",
+    "product_category",
+    "quantity",
+    "unit_price",
+    "region"
+  ],
+  "total_findings": 33,
+  "rows_with_findings": 32,
+  "findings_by_rule": {
+    "iqr_outlier": 19,
+    "duplicate_order_id": 4,
+    "missing_value": 2,
+    "invalid_date_format": 2,
+    "inconsistent_category": 2,
+    "non_positive_numeric": 2,
+    "duplicate_row": 1,
+    "invalid_numeric_format": 1
+  },
+  "approved_product_categories": [
+    "Clothing",
+    "Electronics",
+    "Groceries",
+    "Home Decor",
+    "Office Supplies"
+  ],
+  "notes": [
+    "Findings are review flags, not automatic proof of bad data.",
+    "IQR outliers can be legitimate values.",
+    "Repeated order IDs may be valid for some transaction schemas."
+  ],
+  "input_file": "D:\\data_quality_guardian\\data_quality_guardian\\data\\retail_corrupted.csv",
+  "evaluation": {
+    "expected_injected_findings": 15,
+    "detected_findings": 33,
+    "true_positives": 15,
+    "false_positives": 18,
+    "false_negatives": 0,
+    "precision": 0.4545,
+    "recall": 1.0,
+    "f1_score": 0.625,
+    "interpretation": "Metrics are specific to this synthetic test set; review broad rules such as outlier detection for false positives."
+  }
+}

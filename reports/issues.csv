@@ -1,0 +1,34 @@
+row_index,csv_row_number,column,rule,value,message
+4,6,customer_id,missing_value,,customer_id is blank or uses a recognized missing-value marker.
+11,13,unit_price,missing_value,,unit_price is blank or uses a recognized missing-value marker.
+200,202,__row__,duplicate_row,,This row duplicates an earlier row exactly.
+92,94,order_id,duplicate_order_id,ORD-0093,This order_id appears on more than one row.
+93,95,order_id,duplicate_order_id,ORD-0093,This order_id appears on more than one row.
+100,102,order_id,duplicate_order_id,ORD-0101,This order_id appears on more than one row.
+200,202,order_id,duplicate_order_id,ORD-0101,This order_id appears on more than one row.
+18,20,order_date,invalid_date_format,31/02/2026,Expected a valid date in YYYY-MM-DD format.
+27,29,order_date,invalid_date_format,2026-13-40,Expected a valid date in YYYY-MM-DD format.
+33,35,product_category,inconsistent_category, home decor ,Non-canonical category spelling/case; suggested value: Home Decor.
+47,49,product_category,inconsistent_category,ELECTRONICS,Non-canonical category spelling/case; suggested value: Electronics.
+58,60,quantity,non_positive_numeric,-3,quantity should be greater than zero.
+81,83,quantity,invalid_numeric_format,many,quantity must be numeric.
+69,71,unit_price,non_positive_numeric,0,unit_price should be greater than zero.
+13,15,unit_price,iqr_outlier,568.92,"Value is outside the conservative 3*IQR review bounds [-182, 287]."
+14,16,unit_price,iqr_outlier,586.53,"Value is outside the conservative 3*IQR review bounds [-182, 287]."
+20,22,unit_price,iqr_outlier,289.93,"Value is outside the conservative 3*IQR review bounds [-182, 287]."
+23,25,unit_price,iqr_outlier,305.8,"Value is outside the conservative 3*IQR review bounds [-182, 287]."
+52,54,unit_price,iqr_outlier,369.86,"Value is outside the conservative 3*IQR review bounds [-182, 287]."
+72,74,unit_price,iqr_outlier,439.05,"Value is outside the conservative 3*IQR review bounds [-182, 287]."
+88,90,unit_price,iqr_outlier,518.91,"Value is outside the conservative 3*IQR review bounds [-182, 287]."
+109,111,unit_price,iqr_outlier,288.66,"Value is outside the conservative 3*IQR review bounds [-182, 287]."
+121,123,unit_price,iqr_outlier,99999.0,"Value is outside the conservative 3*IQR review bounds [-182, 287]."
+136,138,unit_price,iqr_outlier,305.91,"Value is outside the conservative 3*IQR review bounds [-182, 287]."
+141,143,unit_price,iqr_outlier,485.3,"Value is outside the conservative 3*IQR review bounds [-182, 287]."
+146,148,unit_price,iqr_outlier,460.63,"Value is outside the conservative 3*IQR review bounds [-182, 287]."
+157,159,unit_price,iqr_outlier,407.17,"Value is outside the conservative 3*IQR review bounds [-182, 287]."
+166,168,unit_price,iqr_outlier,575.12,"Value is outside the conservative 3*IQR review bounds [-182, 287]."
+171,173,unit_price,iqr_outlier,371.66,"Value is outside the conservative 3*IQR review bounds [-182, 287]."
+179,181,unit_price,iqr_outlier,533.65,"Value is outside the conservative 3*IQR review bounds [-182, 287]."
+180,182,unit_price,iqr_outlier,295.75,"Value is outside the conservative 3*IQR review bounds [-182, 287]."
+190,192,unit_price,iqr_outlier,483.88,"Value is outside the conservative 3*IQR review bounds [-182, 287]."
+196,198,unit_price,iqr_outlier,336.33,"Value is outside the conservative 3*IQR review bounds [-182, 287]."
