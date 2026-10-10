@@ -707,23 +707,41 @@ elif app_mode == PAGE_CUSTOM_CSV:
       custom_anomalies = modeled_custom_df[
           modeled_custom_df["ml_anomaly"]
       ].copy()
+
       if not custom_anomalies.empty:
-        sel_custom_id = st.selectbox(
-            "Select Flagged ID to Inspect:",
-            custom_anomalies["display_id"].tolist(),
+        # Create a unique label for every row so identical IDs do not collapse into 1 choice
+        custom_anomalies["dropdown_label"] = (
+            "Row #"
+            + custom_anomalies.index.astype(str)
+            + " | ID: "
+            + custom_anomalies["display_id"].astype(str)
         )
-        t_row = custom_anomalies[
-            custom_anomalies["display_id"] == sel_custom_id
+
+        st.caption(
+            f"Found **{len(custom_anomalies)}** anomaly candidate(s) under"
+            f" current sensitivity ({ui_contamination * 100:.1f}%)."
+        )
+
+        sel_custom_label = st.selectbox(
+            "Select Flagged ID to Inspect:",
+            custom_anomalies["dropdown_label"].tolist(),
+        )
+
+        # Retrieve selected row and define sel_custom_id safely
+        target_row = custom_anomalies[
+            custom_anomalies["dropdown_label"] == sel_custom_label
         ].iloc[0]
-        reasons = AnomalyExplainer.explain_record(t_row, modeled_custom_df)
+        sel_custom_id = str(target_row["display_id"])
+
+        reasons = AnomalyExplainer.explain_record(target_row, modeled_custom_df)
 
         cx1, cx2 = st.columns([1, 2])
         with cx1:
           st.write(f"**Identifier:** `{sel_custom_id}`")
-          st.write(f"**{q_col}:** {t_row.get('quantity', 'N/A')}")
-          st.write(f"**{p_col}:** {t_row.get('unit_price', 'N/A')}")
+          st.write(f"**{q_col}:** {target_row.get('quantity', 'N/A')}")
+          st.write(f"**{p_col}:** {target_row.get('unit_price', 'N/A')}")
           st.write(
-              f"**ML Anomaly Score:** `{t_row.get('anomaly_score', 'N/A')}`"
+              f"**ML Anomaly Score:** `{target_row.get('anomaly_score', 'N/A')}`"
           )
         with cx2:
           for r in reasons:
@@ -738,6 +756,11 @@ elif app_mode == PAGE_CUSTOM_CSV:
             ]],
             use_container_width=True,
             hide_index=True,
+        )
+      else:
+        st.success(
+            "🎉 No anomalies detected in this uploaded dataset under the"
+            f" current sensitivity threshold ({ui_contamination * 100:.1f}%)."
         )
 
     with c_tab3:
