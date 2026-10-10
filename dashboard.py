@@ -39,7 +39,7 @@ st.markdown(
     
     /* Metric Cards with Modern Elevation */
     div[data-testid="stMetric"] {
-        background: linear-gradient(135deg, #ffffff 0%, #f9fafb 100%);
+        background: linear-gradient(354deg, #000d88 0%, #f9fafb 100%);
         border: 1px solid #e5e7eb;
         padding: 18px 22px;
         border-radius: 14px;
