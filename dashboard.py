@@ -695,23 +695,43 @@ elif app_mode == PAGE_CUSTOM_CSV:
             hide_index=True,
         )
 
-    with c_tab3:
+        with c_tab3:
+      st.markdown("##### 🧹 Automated Remediation & Cleansing Engine")
       cleaned_custom_df = user_df.copy()
+
+      # 1. Deduplicate and reset index to prevent InvalidIndexError
       if id_col != "[Row Index]":
         cleaned_custom_df = cleaned_custom_df.drop_duplicates(
             subset=[id_col], keep="first"
-        )
+        ).reset_index(drop=True)
       else:
-        cleaned_custom_df = cleaned_custom_df.drop_duplicates(keep="first")
+        cleaned_custom_df = cleaned_custom_df.drop_duplicates(
+            keep="first"
+        ).reset_index(drop=True)
 
+      # 2. Safely cast to float before imputation to prevent LossySetitemError
       for target_c in [q_col, p_col]:
         numeric_s = pd.to_numeric(
             cleaned_custom_df[target_c], errors="coerce"
+        ).astype(float)
+
+        # Calculate median of strictly positive values
+        positive_vals = numeric_s[numeric_s > 0]
+        med_val = (
+            float(positive_vals.median()) if len(positive_vals) > 0 else 1.0
         )
-        med_val = numeric_s.median() if pd.notna(numeric_s.median()) else 0.0
+        if pd.isna(med_val):
+          med_val = 1.0
+
+        # Safely impute nulls and non-positive numbers
         numeric_s = numeric_s.fillna(med_val)
-        numeric_s[numeric_s <= 0] = med_val
-        cleaned_custom_df[target_c] = numeric_s
+        numeric_s = numeric_s.mask(numeric_s <= 0, med_val)
+
+        # Format integer columns cleanly
+        if "qty" in target_c.lower() or "quantity" in target_c.lower():
+          cleaned_custom_df[target_c] = numeric_s.round().astype(int)
+        else:
+          cleaned_custom_df[target_c] = numeric_s.round(2)
 
       st.dataframe(cleaned_custom_df.head(20), use_container_width=True)
       st.download_button(
