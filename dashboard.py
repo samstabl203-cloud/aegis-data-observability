@@ -1,11 +1,6 @@
 """AegisData: Enterprise Data Observability & ML Assurance Platform.
 
-Includes:
-1. Data Drift Monitor (PSI & KS-Test)
-2. Financial Risk Exposure Calculator (MYR)
-3. Formal Audit Compliance Certificate Exporter
-4. Automated SQL & Great Expectations Rule Generator
-5. Webhook Alert Simulator (Slack/Discord)
+Fully Theme-Adaptive Edition (Seamless Light & Dark Mode Compatibility).
 Run with: streamlit run dashboard.py
 """
 
@@ -34,35 +29,58 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-# ----------------- CUSTOM CSS FOR ENTERPRISE STYLING -----------------
+# ----------------- DYNAMIC ADAPTIVE CSS (LIGHT & DARK MODE) -----------------
 st.markdown(
     """
     <style>
     .block-container { padding-top: 1.8rem; padding-bottom: 3rem; }
+
+    /* Theme-Adaptive Metric Cards */
     div[data-testid="stMetric"] {
-        background: linear-gradient(135deg, #ffffff 0%, #f9fafb 100%);
-        border: 1px solid #e5e7eb;
+        background-color: var(--secondary-background-color) !important;
+        border: 1px solid rgba(128, 128, 128, 0.2) !important;
         padding: 16px 20px;
         border-radius: 12px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        color: var(--text-color) !important;
     }
+    div[data-testid="stMetric"] label {
+        color: var(--text-color) !important;
+        opacity: 0.8;
+    }
+
+    /* Hero Banner: High-contrast gradient designed for both modes */
     .hero-banner {
         background: linear-gradient(90deg, #1e3a8a 0%, #2563eb 50%, #3b82f6 100%);
-        color: #ffffff;
+        color: #ffffff !important;
         padding: 22px 28px;
         border-radius: 14px;
         margin-bottom: 22px;
-        box-shadow: 0 8px 20px rgba(37, 99, 235, 0.16);
+        box-shadow: 0 8px 20px rgba(37, 99, 235, 0.2);
     }
     .hero-banner h1 { color: #ffffff !important; font-size: 1.85rem; margin-bottom: 4px; font-weight: 700; }
-    .hero-banner p { color: #e0e7ff; font-size: 0.95rem; margin-bottom: 0; }
+    .hero-banner p { color: #e0e7ff !important; font-size: 0.95rem; margin-bottom: 0; }
+
+    /* Risk Card: Adaptive container background with vivid red left boundary */
     .risk-card {
-        background: #fff5f5;
-        border: 1px solid #fed7d7;
+        background-color: var(--secondary-background-color);
+        border: 1px solid rgba(229, 62, 62, 0.4);
         border-left: 5px solid #e53e3e;
         padding: 14px 18px;
         border-radius: 10px;
         margin-bottom: 15px;
+        color: var(--text-color);
+    }
+
+    /* Active Session Badge: Adaptive background */
+    .session-badge {
+        background-color: var(--secondary-background-color);
+        border: 1px solid rgba(128, 128, 128, 0.2);
+        border-left: 3px solid #2563eb;
+        padding: 8px 12px;
+        border-radius: 6px;
+        margin-bottom: 8px;
+        color: var(--text-color);
     }
     </style>
 """,
@@ -97,6 +115,27 @@ if "previous_mode" not in st.session_state:
   st.session_state["previous_mode"] = "📊 Observability Dashboard"
 
 
+# ----------------- PLOTLY THEME ADAPTER HELPER -----------------
+def apply_plotly_theme(fig: go.Figure, height: int = 360) -> go.Figure:
+  """Ensures Plotly charts seamlessly adapt to both Streamlit Light & Dark Modes."""
+  fig.update_layout(
+      paper_bgcolor="rgba(0,0,0,0)",
+      plot_bgcolor="rgba(0,0,0,0)",
+      font=dict(color="var(--text-color)", size=12),
+      height=height,
+      margin=dict(l=15, r=15, t=35, b=15),
+  )
+  fig.update_xaxes(
+      gridcolor="rgba(128, 128, 128, 0.15)",
+      zerolinecolor="rgba(128, 128, 128, 0.2)",
+  )
+  fig.update_yaxes(
+      gridcolor="rgba(128, 128, 128, 0.15)",
+      zerolinecolor="rgba(128, 128, 128, 0.2)",
+  )
+  return fig
+
+
 # ----------------- ML PIPELINE UTILITY -----------------
 def run_model_pipeline(
     df: pd.DataFrame, qty_col: str, price_col: str, contamination: float = 0.06
@@ -119,20 +158,17 @@ with st.sidebar:
     st.image("https://img.icons8.com/fluency/96/shield.png", width=46)
   with col_brand:
     st.markdown(
-        "<h3 style='margin:0; font-size:1.25rem; font-weight:700;'>AegisData</h3>",
+        "<h3 style='margin:0; font-size:1.25rem;"
+        " font-weight:700;'>AegisData</h3>",
         unsafe_allow_html=True,
     )
-    st.markdown(
-        "<span style='color:#6b7280; font-size:0.75rem;'>Data Observability &"
-        " Governance</span>",
-        unsafe_allow_html=True,
-    )
+    st.caption("Data Observability & Governance")
 
   st.markdown(
       """
-        <div style="display:flex; align-items:center; gap:6px; background:#f0fdf4; border:1px solid #bbf7d0; padding:4px 10px; border-radius:20px; margin-top:8px; margin-bottom:12px;">
-            <span style="height:7px; width:7px; background-color:#16a34a; border-radius:50%; display:inline-block;"></span>
-            <span style="font-size:0.75rem; color:#15803d; font-weight:600;">System Online • CI/CD Passed</span>
+        <div style="display:flex; align-items:center; gap:6px; background-color:rgba(16, 185, 129, 0.15); border:1px solid rgba(16, 185, 129, 0.4); padding:4px 10px; border-radius:20px; margin-top:8px; margin-bottom:12px;">
+            <span style="height:7px; width:7px; background-color:#10b981; border-radius:50%; display:inline-block;"></span>
+            <span style="font-size:0.75rem; color:#10b981; font-weight:600;">System Online • CI/CD Verified</span>
         </div>
     """,
       unsafe_allow_html=True,
@@ -176,15 +212,15 @@ with st.sidebar:
   if st.session_state["custom_uploaded_df"] is not None:
     st.markdown(
         "<p style='font-size:0.75rem; font-weight:700; text-transform:uppercase;"
-        " color:#9ca3af;'>Active Dataset</p>",
+        " color:var(--text-color); opacity:0.7;'>Active Dataset</p>",
         unsafe_allow_html=True,
     )
     st.markdown(
         f"""
-            <div style="background:#f8fafc; border-left:3px solid #2563eb; padding:8px 12px; border-radius:6px; margin-bottom:8px;">
-                <p style="margin:0; font-size:0.72rem; color:#64748b;">File in Memory:</p>
-                <p style="margin:0; font-size:0.8rem; font-weight:600; color:#0f172a; word-break:break-all;">{st.session_state['custom_filename']}</p>
-                <p style="margin:2px 0 0 0; font-size:0.7rem; color:#2563eb;">{len(st.session_state['custom_uploaded_df']):,} rows loaded</p>
+            <div class="session-badge">
+                <p style="margin:0; font-size:0.72rem; opacity:0.8;">File in Memory:</p>
+                <p style="margin:0; font-size:0.82rem; font-weight:600; word-break:break-all;">{st.session_state['custom_filename']}</p>
+                <p style="margin:2px 0 0 0; font-size:0.72rem; color:#3b82f6; font-weight:600;">{len(st.session_state['custom_uploaded_df']):,} rows loaded</p>
             </div>
         """,
         unsafe_allow_html=True,
@@ -262,8 +298,8 @@ if app_mode == PAGE_OBSERVABILITY:
   st.markdown(
       f"""
     <div class="risk-card">
-        <h4 style="margin:0 0 6px 0; color:#c53030;">💰 Financial & Pipeline Risk Exposure Intercepted</h4>
-        <p style="margin:0; color:#4a5568; font-size:0.92rem;">
+        <h4 style="margin:0 0 6px 0; color:#ef4444;">💰 Financial & Pipeline Risk Exposure Intercepted</h4>
+        <p style="margin:0; font-size:0.92rem;">
             AegisData prevented an estimated <b>RM {total_financial_risk_myr:,.2f}</b> in corrupt billing, extreme scalar pricing errors, 
             and {duplicate_orders_count} duplicate transaction collisions prior to data warehouse ingestion.
         </p>
@@ -293,21 +329,30 @@ if app_mode == PAGE_OBSERVABILITY:
               mode="gauge+number",
               value=health_index,
               title={"text": "Pipeline Health Index", "font": {"size": 18}},
-              number={"suffix": "%", "font": {"size": 36, "color": "#1e3a8a"}},
+              number={"suffix": "%", "font": {"size": 36, "color": "#3b82f6"}},
               gauge={
                   "axis": {"range": [0, 100]},
                   "bar": {
-                      "color": "#2563eb" if health_index > 80 else "#ef4444"
+                      "color": "#3b82f6" if health_index > 80 else "#ef4444"
                   },
                   "steps": [
-                      {"range": [0, 60], "color": "#fee2e2"},
-                      {"range": [60, 80], "color": "#fef3c7"},
-                      {"range": [80, 100], "color": "#dcfce7"},
+                      {
+                          "range": [0, 60],
+                          "color": "rgba(239, 68, 68, 0.25)",
+                      },
+                      {
+                          "range": [60, 80],
+                          "color": "rgba(245, 158, 11, 0.25)",
+                      },
+                      {
+                          "range": [80, 100],
+                          "color": "rgba(16, 185, 129, 0.25)",
+                      },
                   ],
               },
           )
       )
-      fig_gauge.update_layout(height=260, margin=dict(l=20, r=20, t=40, b=20))
+      fig_gauge = apply_plotly_theme(fig_gauge, height=260)
       st.plotly_chart(fig_gauge, use_container_width=True)
 
     with c_kpi:
@@ -348,7 +393,7 @@ if app_mode == PAGE_OBSERVABILITY:
           color_continuous_scale="Blues",
           text="Count",
       )
-      fig_rules.update_layout(height=360)
+      fig_rules = apply_plotly_theme(fig_rules, height=360)
       st.plotly_chart(fig_rules, use_container_width=True)
 
     with col_ch2:
@@ -361,7 +406,7 @@ if app_mode == PAGE_OBSERVABILITY:
           color_discrete_map={False: "#3b82f6", True: "#ef4444"},
           hover_data=["order_id", "product_category", "anomaly_score"],
       )
-      fig_scatter.update_layout(height=360)
+      fig_scatter = apply_plotly_theme(fig_scatter, height=360)
       st.plotly_chart(fig_scatter, use_container_width=True)
 
   # TAB 1.2: XAI
@@ -654,7 +699,7 @@ elif app_mode == PAGE_CUSTOM_CSV:
           },
           hover_data=["display_id"],
       )
-      fig_custom.update_layout(height=360)
+      fig_custom = apply_plotly_theme(fig_custom, height=360)
       st.plotly_chart(fig_custom, use_container_width=True)
       st.dataframe(filtered_df.head(25), use_container_width=True)
 
@@ -695,7 +740,6 @@ elif app_mode == PAGE_CUSTOM_CSV:
             hide_index=True,
         )
 
-    # Sub-tab 3 properly aligned and decoupled from Sub-tab 2
     with c_tab3:
       st.markdown("##### 🧹 Automated Remediation & Cleansing Engine")
       cleaned_custom_df = user_df.copy()
@@ -824,9 +868,8 @@ elif app_mode == PAGE_DRIFT:
     fig_drift_p.update_layout(
         barmode="overlay",
         title="Unit Price Density Overlay",
-        height=300,
-        margin=dict(l=10, r=10, t=30, b=10),
     )
+    fig_drift_p = apply_plotly_theme(fig_drift_p, height=300)
     st.plotly_chart(fig_drift_p, use_container_width=True)
 
   with col_test2:
@@ -867,9 +910,8 @@ elif app_mode == PAGE_DRIFT:
     fig_drift_q.update_layout(
         barmode="overlay",
         title="Quantity Volume Density Overlay",
-        height=300,
-        margin=dict(l=10, r=10, t=30, b=10),
     )
+    fig_drift_q = apply_plotly_theme(fig_drift_q, height=300)
     st.plotly_chart(fig_drift_q, use_container_width=True)
 
   st.divider()
