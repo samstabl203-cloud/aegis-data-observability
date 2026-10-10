@@ -73,14 +73,15 @@ def run_model_pipeline(df: pd.DataFrame, qty_col: str, price_col: str):
 st.sidebar.title("🛡️ AegisData Suite")
 st.sidebar.markdown("**Enterprise Observability & ML Platform**")
 
+# Standardized labels
+PAGE_OBSERVABILITY = "📊 Observability Dashboard"
+PAGE_CUSTOM_CSV = "📂 Custom CSV Uploader & Audit"
+PAGE_STREAM_SIM = "⚡ Live Stream Simulator"
+PAGE_PROVENANCE = "🏛️ Data Provenance & Sources"
+
 app_mode = st.sidebar.radio(
     "Navigation Modes:",
-    [
-        "📊 Observability Dashboard",
-        "📂 Custom CSV Uploader & Audit",
-        "⚡ Live Stream Simulator",
-        "🏛️ Data Provenance & Governance",
-    ],
+    [PAGE_OBSERVABILITY, PAGE_CUSTOM_CSV, PAGE_STREAM_SIM, PAGE_PROVENANCE],
 )
 
 # Cross-page navigation notification when custom data exists in memory
@@ -111,9 +112,9 @@ st.sidebar.info(
 )
 
 # ==============================================================================
-# MODE 1: OBSERVABILITY DASHBOARD (ROLE-BASED VIEWS)
+# MODE 1: OBSERVABILITY DASHBOARD
 # ==============================================================================
-if app_mode == "📊 Observability Dashboard":
+if app_mode == PAGE_OBSERVABILITY:
   summary_json = list(reports_dir.glob("*.json"))
   if not summary_json:
     st.warning(
@@ -141,7 +142,6 @@ if app_mode == "📊 Observability Dashboard":
       "🧹 Auto-Remediation",
   ])
 
-  # 1.1 QUALITY OVERVIEW
   with tab_overview:
     st.subheader("📌 System Health & Benchmark Performance")
     eval_data = report.get("evaluation", {})
@@ -191,14 +191,8 @@ if app_mode == "📊 Observability Dashboard":
       )
       st.plotly_chart(fig_scatter, use_container_width=True)
 
-  # 1.2 EXPLAINABLE AI (XAI)
   with tab_xai:
     st.subheader("🧠 Anomaly Root-Cause Explanations (XAI)")
-    st.markdown(
-        "Natural-language diagnostic breakdowns explaining why records were"
-        " flagged by statistical filters or machine learning."
-    )
-
     anomalies = modeled_df[modeled_df["ml_anomaly"]].copy()
     if not anomalies.empty:
       selected_order = st.selectbox(
@@ -206,7 +200,6 @@ if app_mode == "📊 Observability Dashboard":
           anomalies["order_id"].tolist(),
       )
       target_row = anomalies[anomalies["order_id"] == selected_order].iloc[0]
-
       reasons = AnomalyExplainer.explain_record(target_row, modeled_df)
 
       col_a, col_b = st.columns([1, 2])
@@ -239,15 +232,8 @@ if app_mode == "📊 Observability Dashboard":
     else:
       st.info("No anomalies detected in the primary dataset.")
 
-  # 1.3 AUTO-REMEDIATION
   with tab_remediation:
     st.subheader("🧹 Automated Cleansing & Remediation")
-    st.markdown(
-        "Systematically sanitize data: eliminate primary key duplicates,"
-        " standardize categories, format dates, and impute missing numerical"
-        " attributes."
-    )
-
     cleaner = AutoDataCleaner()
     cleaned_df, cleaning_log = cleaner.clean_dataset(raw_df)
 
@@ -270,16 +256,15 @@ if app_mode == "📊 Observability Dashboard":
     )
 
 # ==============================================================================
-# MODE 2: CUSTOM CSV UPLOADER & AUDIT (PERSISTENT & PROTECTED)
+# MODE 2: CUSTOM CSV UPLOADER & AUDIT
 # ==============================================================================
-elif app_mode == "📂 Custom CSV Uploader & Audit":
+elif app_mode == PAGE_CUSTOM_CSV:
   st.title("📂 Custom Tabular Ingestion, XAI & Auto-Remediation")
   st.caption(
       "Upload any custom CSV dataset. Your session is protected against"
       " accidental navigation loss."
   )
 
-  # Visual Notification Banner for Active Session
   if st.session_state["custom_uploaded_df"] is not None:
     st.warning(
         "🔔 **Active Session Notification:** Dataset"
@@ -359,7 +344,6 @@ elif app_mode == "📂 Custom CSV Uploader & Audit":
         "🧹 Custom Auto-Remediation",
     ])
 
-    # ----------------- SUB-TAB 2.1: QUALITY SCAN -----------------
     with c_tab1:
       st.subheader(f"📊 Audit Summary: {current_filename}")
       null_count = modeled_custom_df[[q_col, p_col]].isna().sum().sum()
@@ -393,7 +377,6 @@ elif app_mode == "📂 Custom CSV Uploader & Audit":
       )
       st.plotly_chart(fig_custom, use_container_width=True)
 
-    # ----------------- SUB-TAB 2.2: XAI FOR CUSTOM CSV -----------------
     with c_tab2:
       st.subheader("🧠 Custom Dataset Anomaly Root-Cause Explanations")
       custom_anomalies = modeled_custom_df[
@@ -448,15 +431,8 @@ elif app_mode == "📂 Custom CSV Uploader & Audit":
             "🎉 No multivariate anomalies detected in this uploaded dataset!"
         )
 
-    # ----------------- SUB-TAB 2.3: AUTO-REMEDIATION FOR CUSTOM CSV -----------------
     with c_tab3:
       st.subheader("🧹 Automated Cleansing & Remediation for Uploaded CSV")
-      st.markdown(
-          "Automatically repair detected defects: remove duplicate rows,"
-          " coerce invalid numerical formats, and impute missing values with"
-          " statistical medians."
-      )
-
       cleaned_custom_df = user_df.copy()
       cleaning_stats = {
           "duplicates_removed": 0,
@@ -515,7 +491,7 @@ elif app_mode == "📂 Custom CSV Uploader & Audit":
 # ==============================================================================
 # MODE 3: LIVE STREAM SIMULATOR
 # ==============================================================================
-elif app_mode == "⚡ Live Stream Simulator":
+elif app_mode == PAGE_STREAM_SIM:
   st.title("⚡ Real-Time Streaming Ingestion & Live Auditing")
   st.caption(
       "Simulates a live transactional event stream (e.g., DuitNow, FPX, TNG)"
@@ -549,9 +525,7 @@ elif app_mode == "⚡ Live Stream Simulator":
 
       is_corrupt = random.random() < 0.25
       if is_corrupt:
-        price = (
-            -50.0 if random.random() < 0.5 else 99999.0
-        )  # Outlier or negative
+        price = -50.0 if random.random() < 0.5 else 99999.0
         qty = -1 if price > 0 else 5
         status_badge = "🔴 DEFECT FLAGGED"
         reason = "Negative qty or extreme outlier price"
@@ -589,9 +563,9 @@ elif app_mode == "⚡ Live Stream Simulator":
     )
 
 # ==============================================================================
-# MODE 4: DATA PROVENANCE & SOURCES (DEDICATED SOURCE ATTRIBUTION & LINKS)
+# MODE 4: DATA PROVENANCE & SOURCES (DEDICATED SOURCE ATTRIBUTION & URL LINKS)
 # ==============================================================================
-elif app_mode == "🏛️ Data Provenance & Sources":
+elif app_mode == PAGE_PROVENANCE:
   st.title("🏛️ Data Provenance, Sources & Attribution Registry")
   st.caption(
       "A complete catalog of all datasets utilized across the AegisData"
@@ -599,7 +573,6 @@ elif app_mode == "🏛️ Data Provenance & Sources":
       " governance metadata."
   )
 
-  # Structured source metadata with direct clickable URLs
   sources_data = [
       {
           "Dataset Name": "OpenDOSM Wholesale & Retail Trade Index",
@@ -636,9 +609,7 @@ elif app_mode == "🏛️ Data Provenance & Sources":
           "Authoritative Source": (
               "AegisData Domain Engine (Local Generator: src/fetch_malaysia_data.py)"
           ),
-          "Access URL": (
-              "https://github.com/project1111/aegis-data/blob/main/data/malaysia_retail_transactions.csv"
-          ),
+          "Access URL": "https://data.gov.my",
           "Catalog Portal": "https://data.gov.my",
           "Data Type": "Synthesized Benchmark (PDPA 2010 Compliant)",
           "License": "Academic Educational Use (FYP)",
@@ -655,7 +626,7 @@ elif app_mode == "🏛️ Data Provenance & Sources":
               " data/injected_errors.json)"
           ),
           "Access URL": (
-              "https://github.com/project1111/aegis-data/blob/main/data/injected_errors.json"
+              "https://raw.githubusercontent.com/project1111/aegis-data/main/data/injected_errors.json"
           ),
           "Catalog Portal": "https://github.com",
           "Data Type": "Ground-Truth Defect Matrix",
@@ -671,7 +642,6 @@ elif app_mode == "🏛️ Data Provenance & Sources":
 
   st.subheader("📋 Dataset Provenance Registry")
 
-  # Render interactive table with clickable URL links
   st.dataframe(
       sources_df,
       column_config={
@@ -692,9 +662,7 @@ elif app_mode == "🏛️ Data Provenance & Sources":
 
   st.divider()
 
-  # Detailed breakdown cards with direct source links
   st.subheader("🔍 Deep Dive: Source Origins & Attribution")
-
   col_src1, col_src2 = st.columns(2)
 
   with col_src1:
@@ -704,7 +672,7 @@ elif app_mode == "🏛️ Data Provenance & Sources":
         * **Official Portal:** [open.dosm.gov.my](https://open.dosm.gov.my) | [data.gov.my](https://data.gov.my)
         * **Direct CSV Endpoint:** [`https://storage.dosm.gov.my/iowrt/iowrt.csv`](https://storage.dosm.gov.my/iowrt/iowrt.csv)
         * **License:** Creative Commons Attribution 4.0 International ([CC BY 4.0](https://creativecommons.org/licenses/by/4.0/))
-        * **Usage in AegisData:** Provides the real-world macro retail sales volumes and baseline transaction value trends in Malaysia.
+        * **Usage in AegisData:** Provides real-world macro retail sales volumes and baseline transaction value trends in Malaysia.
         """)
 
   with col_src2:
@@ -718,7 +686,6 @@ elif app_mode == "🏛️ Data Provenance & Sources":
 
   st.divider()
 
-  # Academic Citation formatted for thesis
   st.subheader("📑 Formal Academic Citations for FYP Thesis")
   st.markdown("""
     When referencing these data sources in your dissertation or project documentation, use the following formal citation:
