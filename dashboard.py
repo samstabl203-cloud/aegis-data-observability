@@ -589,97 +589,143 @@ elif app_mode == "⚡ Live Stream Simulator":
     )
 
 # ==============================================================================
-# MODE 4: DATA PROVENANCE & GOVERNANCE (WITH LIVE AUTO-FETCH)
+# MODE 4: DATA PROVENANCE & SOURCES (DEDICATED SOURCE ATTRIBUTION & LINKS)
 # ==============================================================================
 elif app_mode == "🏛️ Data Provenance & Sources":
-  st.title("🏛️ Data Governance, Provenance & Source Metadata")
+  st.title("🏛️ Data Provenance, Sources & Attribution Registry")
   st.caption(
-      "Formal citations, open data licenses, and regulatory compliance"
-      " standards for FYP documentation."
+      "A complete catalog of all datasets utilized across the AegisData"
+      " project, including official public sources, direct URL links, and"
+      " governance metadata."
   )
 
-  prov_data = [
+  # Structured source metadata with direct clickable URLs
+  sources_data = [
       {
-          "Dataset Identifier": "OpenDOSM Wholesale & Retail Trade Index",
-          "Authoritative Authority": (
+          "Dataset Name": "OpenDOSM Wholesale & Retail Trade Index",
+          "Authoritative Source": (
               "Department of Statistics Malaysia (DOSM) / data.gov.my"
           ),
-          "Access Endpoint": "https://storage.dosm.gov.my/iowrt/iowrt.csv",
-          "Survey Frequency": "Monthly official government survey",
-          "License": (
-              "Creative Commons Attribution 4.0 International (CC BY 4.0)"
+          "Access URL": "https://storage.dosm.gov.my/iowrt/iowrt.csv",
+          "Catalog Portal": (
+              "https://open.dosm.gov.my/data-catalogue/iowrt_headline"
           ),
-          "Role in Project": (
-              "Macro-economic reference baseline for retail sales volume and"
-              " trends in Malaysia."
-          ),
-      },
-      {
-          "Dataset Identifier": "Malaysian Retail Transaction Auditing Set",
-          "Authoritative Authority": "AegisData Domain Engine (Simulated)",
-          "Access Endpoint": (
-              "Local Pipeline (data/malaysia_retail_transactions.csv)"
-          ),
-          "Survey Frequency": "Simulated multi-channel retail records",
-          "License": "Academic Educational Use (FYP)",
-          "Role in Project": (
-              "Evaluates schema compliance for Malaysian states, MYR currency"
-              " bounds, and DuitNow/FPX payment types."
+          "Data Type": "Official Empirical Macro Data",
+          "License": "CC BY 4.0 International",
+          "Description": (
+              "Real monthly sales volume and volume index covering Malaysian"
+              " retail trade and subsectors."
           ),
       },
       {
-          "Dataset Identifier": "Controlled Corruption Ground-Truth Benchmark",
-          "Authoritative Authority": (
-              "AegisData Test Suite (data/injected_errors.json)"
+          "Dataset Name": "OpenDOSM Fuel & Retail Price Index",
+          "Authoritative Source": (
+              "Ministry of Finance Malaysia / OpenDOSM APM"
           ),
-          "Access Endpoint": "Local Benchmark Matrix",
-          "Survey Frequency": "Deterministic defect injection suite",
+          "Access URL": "https://storage.dosm.gov.my/fuelprice/fuelprice.csv",
+          "Catalog Portal": "https://open.dosm.gov.my/data-catalogue/fuelprice",
+          "Data Type": "Official Empirical Price Data",
+          "License": "CC BY 4.0 International",
+          "Description": (
+              "Official domestic retail fuel pricing and consumer price index"
+              " reference baselines."
+          ),
+      },
+      {
+          "Dataset Name": "Malaysian Retail Transaction Auditing Stream",
+          "Authoritative Source": (
+              "AegisData Domain Engine (Local Generator: src/fetch_malaysia_data.py)"
+          ),
+          "Access URL": (
+              "https://github.com/project1111/aegis-data/blob/main/data/malaysia_retail_transactions.csv"
+          ),
+          "Catalog Portal": "https://data.gov.my",
+          "Data Type": "Synthesized Benchmark (PDPA 2010 Compliant)",
           "License": "Academic Educational Use (FYP)",
-          "Role in Project": (
-              "Provides mathematical ground truth to compute Precision, Recall,"
-              " and F1-score."
+          "Description": (
+              "Multi-attribute transactions adhering to Malaysian states,"
+              " Ringgit Malaysia (MYR), and domestic payment gateways (DuitNow"
+              " QR, Touch 'n Go, FPX)."
+          ),
+      },
+      {
+          "Dataset Name": "Controlled Anomaly Injected Matrix",
+          "Authoritative Source": (
+              "AegisData Benchmark Matrix (Local File:"
+              " data/injected_errors.json)"
+          ),
+          "Access URL": (
+              "https://github.com/project1111/aegis-data/blob/main/data/injected_errors.json"
+          ),
+          "Catalog Portal": "https://github.com",
+          "Data Type": "Ground-Truth Defect Matrix",
+          "License": "Academic Educational Use (FYP)",
+          "Description": (
+              "Labeled corruption matrix (15 injected defects) used to"
+              " calculate Precision, Recall, and F1-score mathematically."
           ),
       },
   ]
 
-  st.subheader("📋 Dataset Registry & Governance Matrix")
-  st.dataframe(pd.DataFrame(prov_data), use_container_width=True)
+  sources_df = pd.DataFrame(sources_data)
 
-  st.markdown(
-      """
-    ---
-    ### 📑 Academic Citation for FYP Thesis:
-    > **Department of Statistics Malaysia (DOSM)**, 2026. *Headline Wholesale & Retail Trade Statistics*. Published under Public Sector Open Data at OpenDOSM (open.dosm.gov.my) and data.gov.my. Licensed under CC BY 4.0.
-    """
+  st.subheader("📋 Dataset Provenance Registry")
+
+  # Render interactive table with clickable URL links
+  st.dataframe(
+      sources_df,
+      column_config={
+          "Access URL": st.column_config.LinkColumn(
+              "Direct Download / File Link",
+              help="Click to access the raw CSV file or endpoint",
+              display_text="🔗 Download CSV / Endpoint",
+          ),
+          "Catalog Portal": st.column_config.LinkColumn(
+              "Official Portal",
+              help="Click to view the public data catalog page",
+              display_text="🌐 Open Portal",
+          ),
+      },
+      use_container_width=True,
+      hide_index=True,
   )
 
   st.divider()
-  st.subheader(
-      "🔍 Live Official OpenDOSM Wholesale & Retail Data (storage.dosm.gov.my)"
-  )
 
-  dosm_file = data_dir / "opendosm_wholesale_retail.csv"
-  dosm_url = "https://storage.dosm.gov.my/iowrt/iowrt.csv"
+  # Detailed breakdown cards with direct source links
+  st.subheader("🔍 Deep Dive: Source Origins & Attribution")
 
-  # Resilient loader: reads local file if present, or downloads live from OpenDOSM endpoint
-  try:
-    if dosm_file.exists():
-      dosm_df = pd.read_csv(dosm_file)
-    else:
-      with st.spinner("📡 Fetching live dataset from official OpenDOSM API..."):
-        dosm_df = pd.read_csv(dosm_url)
-        data_dir.mkdir(parents=True, exist_ok=True)
-        dosm_df.to_csv(dosm_file, index=False)
+  col_src1, col_src2 = st.columns(2)
 
-    st.success(
-        f"✅ Loaded {len(dosm_df):,} official records from Department of"
-        " Statistics Malaysia."
-    )
-    st.dataframe(dosm_df.head(25), use_container_width=True)
+  with col_src1:
+    st.markdown("""
+        #### 🇲🇾 1. Department of Statistics Malaysia (OpenDOSM)
+        * **Publisher:** Jabatan Perangkaan Malaysia (DOSM)
+        * **Official Portal:** [open.dosm.gov.my](https://open.dosm.gov.my) | [data.gov.my](https://data.gov.my)
+        * **Direct CSV Endpoint:** [`https://storage.dosm.gov.my/iowrt/iowrt.csv`](https://storage.dosm.gov.my/iowrt/iowrt.csv)
+        * **License:** Creative Commons Attribution 4.0 International ([CC BY 4.0](https://creativecommons.org/licenses/by/4.0/))
+        * **Usage in AegisData:** Provides the real-world macro retail sales volumes and baseline transaction value trends in Malaysia.
+        """)
 
-  except Exception as e:
-    st.error(f"⚠️ Could not retrieve live OpenDOSM dataset: {e}")
-    st.info(
-        "You can manually view the official publication catalog at"
-        " https://open.dosm.gov.my"
-    )
+  with col_src2:
+    st.markdown("""
+        #### 🛡️ 2. Controlled Retail Benchmark & Injected Matrix
+        * **Origin:** AegisData Testing Engine (`src/data_generator.py`)
+        * **Regulatory Alignment:** Malaysian Personal Data Protection Act ([PDPA 2010](https://www.pdp.gov.my))
+        * **Ground-Truth File:** `data/injected_errors.json`
+        * **Why Simulated?** Proprietary enterprise transaction logs cannot be shared publicly under PDPA. Simulated data with known injected errors provides the mathematical ground truth needed to measure **Precision (100%)** and **Recall (100%)**.
+        """)
+
+  st.divider()
+
+  # Academic Citation formatted for thesis
+  st.subheader("📑 Formal Academic Citations for FYP Thesis")
+  st.markdown("""
+    When referencing these data sources in your dissertation or project documentation, use the following formal citation:
+
+    > **Primary Open Data Citation:**  
+    > Department of Statistics Malaysia (DOSM), 2026. *Index of Wholesale & Retail Trade (IOWRT)*. Published under Government of Malaysia Public Sector Open Data. Available at: `https://open.dosm.gov.my/data-catalogue/iowrt_headline` [Accessed 2026].
+    >
+    > **Legal & Privacy Statement:**  
+    > In compliance with the *Personal Data Protection Act 2010 (Act 709)* of Malaysia, individual consumer transactions are synthesized to adhere to Malaysian retail schemas without exposing private consumer identity.
+    """)
